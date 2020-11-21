@@ -83,7 +83,6 @@ def print_choice(beg, end, SONG_INFO, type):
     # Check if end is more than length of SONG_INFO
     if end > len(SONG_INFO):
         end = len(SONG_INFO)
-
     while beg != end:
         print(Fore.LIGHTMAGENTA_EX, end='')
         print(' [' + str(beg+1) + '] ', end='')
@@ -99,6 +98,10 @@ def print_choice(beg, end, SONG_INFO, type):
         print(Fore.YELLOW, end='')
         if type == 'metadata':
             print(SONG_INFO[beg].artist_name, end='')
+            print(Style.RESET_ALL, end='')
+            print(' from ', end='')
+            print(Fore.LIGHTBLUE_EX, end='')
+            print(SONG_INFO[beg].collection_name, end='')
         if type == 'mp3':
             print(SONG_INFO[beg]['author_name'], end='')
             print(Style.RESET_ALL, end='')
