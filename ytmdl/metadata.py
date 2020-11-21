@@ -8,7 +8,7 @@ from ytmdl.stringutils import (
 )
 from ytmdl import defaults
 from simber import Logger
-from ytmdl.meta import gaana, deezer, saavn, lastfm, preconfig
+from ytmdl.meta import gaana, deezer, saavn, lastfm, preconfig, itunes
 from unidecode import unidecode
 
 logger = Logger('metadata')
@@ -23,18 +23,20 @@ def _logger_provider_error(exception, name):
             ".format(name, logger.get_log_file()))
 
 
-def get_from_itunes(SONG_NAME):
-    """Try to download the metadata using itunespy."""
+def get_from_itunes(SONG_NAME, filters):
+    """Try to download the metadata using itunespy.
     # Try to get the song data from itunes
+    In the passed filters the first element is artist.
+    The second element is album."""
     try:
-        SONG_INFO = itunespy.search_track(SONG_NAME)
+        SONG_INFO = itunes.searchSong(SONG_NAME, filters[0], filters[1])
         return SONG_INFO
     except Exception as e:
         _logger_provider_error(e, 'iTunes')
         return None
 
 
-def get_from_gaana(SONG_NAME):
+def get_from_gaana(SONG_NAME, _):
     """Get some tags from gaana."""
     try:
         nana = gaana.searchSong(SONG_NAME)
@@ -44,7 +46,7 @@ def get_from_gaana(SONG_NAME):
         return None
 
 
-def get_from_deezer(SONG_NAME):
+def get_from_deezer(SONG_NAME, _):
     """Get some tags from deezer."""
     try:
         songs = deezer.searchSong(SONG_NAME)
@@ -53,7 +55,7 @@ def get_from_deezer(SONG_NAME):
         _logger_provider_error(e, 'Deezer')
 
 
-def get_from_lastfm(SONG_NAME):
+def get_from_lastfm(SONG_NAME, _):
     """Get metadata from Last FM"""
     try:
         songs = lastfm.searchSong(SONG_NAME)
@@ -62,7 +64,7 @@ def get_from_lastfm(SONG_NAME):
         _logger_provider_error(e, 'LastFM')
 
 
-def get_from_saavn(SONG_NAME):
+def get_from_saavn(SONG_NAME, _):
     """
     Get the songs from JioSaavn
     """
@@ -126,9 +128,9 @@ def filterSongs(data, filters=[]):
         albumMatch = True
 
         if filters[0] is not None:
-            artistMatch = (songData.artist_name == filters[0])
+            artistMatch = (filters[0].lower() in songData.artist_name.lower())
         if filters[1] is not None:
-            albumMatch = (songData.collection_name == filters[1])
+            albumMatch = (filters[1].lower() in songData.collection_name.lower())
 
         if artistMatch and albumMatch:
             new_tuple.append(songData)
@@ -168,7 +170,7 @@ def SEARCH_SONG(q="Tera Buzz", filters=[]):
     for provider in metadata_providers:
         if provider in GET_METADATA_ACTIONS:
             data_provider = GET_METADATA_ACTIONS.get(
-                provider, lambda _: None)(q)
+                provider, lambda _: None)(q, filters)
             if data_provider:
                 _extend_to_be_sorted_and_rest(
                     data_provider, to_be_sorted, rest, filters)
