@@ -147,5 +147,33 @@ def get_new_title(old_title):
     return title
 
 
+def get_new_album_name(old_album_name):
+    """
+    Ask the user if they would like to go with the old
+    title passed as an argument.
+
+    If they say so, it will be returned as it is.
+
+    However, if they want to change the title, get the new
+    title and return that one.
+    """
+    logger.info(
+            "Current album title for the playlist is: `{}`".format(old_album_name)
+        )
+    logger.info(
+            "Most extracted titles are not accurate and they affect the meta search"
+            )
+
+    is_change = input("Would you like to change?[Y/n] ")
+    # Replace space
+    is_change = stringutils.replace_space(is_change, '')
+
+    if len(is_change) and is_change[0].lower() == 'n':
+        return old_album_name
+
+    # Else ask for new title
+    title = str(input("Enter the new title: "))
+    return title
+
 if __name__ == "__main__":
     print(get_new_title("Haha"))

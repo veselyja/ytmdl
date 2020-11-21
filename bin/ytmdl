@@ -454,7 +454,8 @@ def extract_data():
         # Before passing the args, make the song name None
         # so that the song name will be extracted in main
         args.SONG_NAME = []
-
+        if args.album is None or len(args.album) == 0:
+            args.album = utility.get_new_album_name(playlist_name)
         # Iterate and work on the data.
         url_base = "https://www.youtube.com/watch?v="
         for song in songs:
